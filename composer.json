@@ -1,0 +1,23 @@
+{
+    "name": "armphp/images-api-client-sdk",
+    "description": "API for Image API Client",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Renato Miawaki",
+            "email": "renato.miawaki@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "ImageClientSDK": "src/arm/modules/images"
+        },
+        "psr-4": {
+            "ARM\\Modules\\Images\\ImageClientSDK\\": "src/arm/modules/images"
+        }
+    },
+    "require": {
+        "php": ">=5.5.9"
+    }
+}
