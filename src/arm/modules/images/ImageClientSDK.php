@@ -53,7 +53,7 @@ class ImageClientSDK {
 	/**
 	 * Retorna um erro tratado e já gera excessão caso não funcione
 	 * @param $result
-	 * @return null
+	 * @return null|something
 	 * @throws \ErrorException
 	 */
 	protected function getResultHandled( $result ){
@@ -66,10 +66,14 @@ class ImageClientSDK {
 		return NULL ;
 	}
 	/**
+	 * Bind entre obj enviado e ARMAlbumVO
 	 * @param $obj
-	 * @return ARMAlbumVO
+	 * @return ARMAlbumVO|null
 	 */
 	public function bindToAlbumVO( $obj ){
+		if(!$obj){
+			return NULL;
+		}
 		$albumVO = new ARMAlbumVO() ;
 		$albumVO->id = (isset($obj->id))?$obj->id:NULL ;
 		$albumVO->active = (isset($obj->active))?$obj->active:NULL ;
@@ -110,62 +114,120 @@ class ImageClientSDK {
 		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
 		return $this->getResultHandled( $result ) ;
 	}
+
+	/**
+	 *
+	 * retorno { success:bool, result:ARMAlbumVO, array_messages:string[] }
+	 * @param ARMAlbumVO $albumVO
+	 * @return ARMReturnResultVO|null
+	 * @throws \ErrorException
+	 */
 	public function editAlbumInfo( ARMAlbumVO $albumVO){
-		//TODO: fazer funcionar
+		if(!$albumVO->id){
+			throw new \ErrorException("album id?") ;
+		}
+		$query = http_build_query( array(
+			"app"=> $this->_config->app ,
+			"token"=> $this->_config->token
+		) ) ;
+
+		$postdata = http_build_query(
+			(array) $albumVO
+		);
+
+		$opts = array('http' =>
+			array(
+				'method'  => 'POST',
+				'header'  => 'Content-type: application/x-www-form-urlencoded',
+				'content' => $postdata
+			)
+		);
+		$url = $this->_config->url ."album/edit/?".$query;
+		$context  = stream_context_create($opts);
+		$resultString = file_get_contents($url, false, $context) ;
+		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
+		return $this->getResultHandled( $result ) ;
 	}
+
+	/**
+	 * Desvincula uma imagem a um album
+	 * @param $image_id
+	 * @param $album_id
+	 * @param string $private_token
+	 * @return bool|null
+	 * @throws \ErrorException
+	 */
 	public function removeImageFromAlbum( $image_id, $album_id, $private_token = "" ){
+		if(!$image_id || !$album_id){
+			return NULL;
+		}
+		$query = http_build_query( array(
+			"app"=> $this->_config->app ,
+			"token"=> $this->_config->token,
+			"image_id" =>$image_id,
+			"album_id" =>$album_id,
+			"private_token"=>$private_token
+		) ) ;
+		$url = $this->_config->url ."album/remove_image_from_album/?".$query;
 		//
+		$resultString = file_get_contents( $url ) ;
+		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
+		return $this->getResultHandled( $result ) ;
 	}
 }
-class ImageClientConfigVO{
-	/**
-	 * nome do seu app na api
-	 * @var string
-	 */
-	public $app ;
-	/**
-	 * url de resposta da app
-	 * @var string
-	 */
-	public $url ;
-	/**
-	 * Token privado da api, isso não deve ser visivel para o usuário de seu app
-	 * api secret
-	 * @var string
-	 */
-	public $token ;
+if( ! class_exists( "ImageClientConfigVO" ) ) {
+	class ImageClientConfigVO
+	{
+		/**
+		 * nome do seu app na api
+		 * @var string
+		 */
+		public $app;
+		/**
+		 * url de resposta da app
+		 * @var string
+		 */
+		public $url;
+		/**
+		 * Token privado da api, isso não deve ser visivel para o usuário de seu app
+		 * api secret
+		 * @var string
+		 */
+		public $token;
+	}
 }
-class ARMAlbumVO {
+if( ! class_exists( "ARMAlbumVO" ) ) {
+	class ARMAlbumVO
+	{
 
+		/**
+		 * @type : int(11)
+		 */
+		public $id;
 
+		/**
+		 * @type : int(11)
+		 */
+		public $active;
 
-	/**
-	 * @type : int(11)
-	 */
-	public $id;
+		/**
+		 * @type : int(11)
+		 */
+		public $order;
 
-	/**
-	 * @type : int(11)
-	 */
-	public $active;
+		/**
+		 * @type : varchar(255)
+		 */
+		public $name;
 
-	/**
-	 * @type : int(11)
-	 */
-	public $order;
+		/**
+		 * @type : text
+		 */
+		public $description;
 
-	/**
-	 * @type : varchar(255)
-	 */
-	public $name;
-
-	/**
-	 * @type : text
-	 */
-	public $description;
-
-	/**
-	 * @type : varchar(255)
-	 */
-	public $private_token;
+		/**
+		 * @type : varchar(255)
+		 */
+		public $private_token;
+	}
 }
