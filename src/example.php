@@ -59,8 +59,16 @@ $ImageClientSDK->setConfig( $config ) ;
 
 
 ############  REMOVENDO UMA IMAGEM DE UM ALBUM ############
+//$album_id = 1 ;
+//$image_id = 1 ;
+//$private_token = "";
+//$resultRemoveImageAlbum = $ImageClientSDK->removeImageFromAlbum($image_id, $album_id, $private_token) ;
+//var_dump( $resultRemoveImageAlbum ) ;
+
+
+############  REMOVENDO UMA IMAGEM DE UM ALBUM ############
 $album_id = 1 ;
-$image_id = 1 ;
+$alias = "album" ;
 $private_token = "";
-$resultRemoveImageAlbum = $ImageClientSDK->removeImageFromAlbum($image_id, $album_id, $private_token) ;
-var_dump( $resultRemoveImageAlbum ) ;
+$resultSentImage = $ImageClientSDK->sendImage("arm_logo.jpg",$album_id, $alias, $private_token ) ;
+var_dump( $resultSentImage ) ;

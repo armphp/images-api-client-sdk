@@ -15,8 +15,38 @@ class ImageClientSDK {
 	public function setConfig( ImageClientConfigVO $config ){
 		$this->_config = $config ;
 	}
-	public function sendImage( $localPath, $album_id = NULL, $alias = "album" ){
-		//TODO: fazer funcionar
+
+	/**
+	 * Envia um arquivo local para um album
+	 * @param $localPath file
+	 * @param null $album_id
+	 * @param string $alias
+	 * @param string $private_token
+	 * @return mixed
+	 * @throws \ErrorException
+	 */
+	public function sendImage( $localPath, $album_id = NULL, $alias = "album" , $private_token = ""){
+		if(!file_exists($localPath)){
+			throw new \ErrorException("file not exists $localPath ") ;
+		}
+		$query = http_build_query( array(
+			"private_token"=>$private_token,
+			"app"=> $this->_config->app,
+			"alias"=> $alias,
+			"album_id"=> $album_id,
+			"var_name"=> "file"
+		) ) ;
+		$url = $this->_config->url ."image/save/?".$query;
+
+		$ch = curl_init( $url ) ;
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true) ;
+		curl_setopt($ch, CURLOPT_POST, 1) ;
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true) ;
+		$mime = mime_content_type( $localPath ) ;
+		$args["token"] = $this->_config->token ;
+		$args['file'] = new \CurlFile( $localPath , $mime , basename( $localPath ) );
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $args) ;
+		return curl_exec($ch);
 	}
 
 	/**
