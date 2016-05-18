@@ -10,7 +10,9 @@ use ARM\Modules\Images;
 
 $config = new Images\ImageClientConfigVO();
 $config->app 		= "teste" ;
-$config->url 		= "http://localhost/images_project/" ;
+//$config->url 		= "http://localhost/images_project/" ;
+$config->url 		= "http://images.idress.com.br/" ;
+
 $config->token 		= "" ;
 
 $ImageClientSDK = new Images\ImageClientSDK() ;
