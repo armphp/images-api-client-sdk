@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: renato
+ * User: Renato Miawaki
  * Date: 17/05/16
  * Time: 15:13
  */
@@ -14,8 +14,55 @@ class ImageClientSDK {
 	protected $_config ;
 	public function setConfig( ImageClientConfigVO $config ){
 		$this->_config = $config ;
+		//precisa da barra
+		$this->_config->url = \ARMDataHandler::removeLastBar( $this->_config->url )."/";
 	}
 
+
+	/**
+	 * Retorna o src da imagem original
+	 * Útil apenas para projetos em que o módulo sdk está instalado no mesmo servidor.
+	 *
+	 * @param $id
+	 * @param null $alias
+	 * @return something|null
+	 * @throws \ErrorException
+	 */
+	public function getImageRawSrc( $id , $alias = NULL ){
+		$query = http_build_query( array(
+			"app"=> $this->_config->app ,
+			"token"=> $this->_config->token,
+			"alias"=>$alias,
+			"raw"=>1
+		) ) ;
+		$url = $this->_config->url ."image/show/id.$id/?".$query;
+		li( $url ) ;
+		$resultString = file_get_contents( $url ) ;
+		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
+		return $this->getResultHandled( $result ) ;
+	}
+
+	/**
+	 * Retorna a url da imagem no projeto configurado
+	 * @param $id
+	 * @param null $width
+	 * @param null $height
+	 * @param null $mode - ver os modos possíveis de crop e proporções
+	 * @param int $quality
+	 * @return string
+	 */
+	public function getImageUrl( $id, $width = NULL, $height = NULL, $mode = NULL , $quality = 100 ){
+		$query = http_build_query( array(
+			"app"=> $this->_config->app ,
+			"token"=> $this->_config->token,
+			"width"=>$width,
+			"height"=>$height,
+			"mode"=>$mode,
+			"quality"=>$quality
+		) ) ;
+		$url = $this->_config->url ."image/show/id.$id/?".$query;
+		return $url ;
+	}
 	/**
 	 * Envia um arquivo local para um album
 	 * @param $localPath file
@@ -37,7 +84,6 @@ class ImageClientSDK {
 			"var_name"=> "file"
 		) ) ;
 		$url = $this->_config->url ."image/save/?".$query;
-
 		$ch = curl_init( $url ) ;
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true) ;
 		curl_setopt($ch, CURLOPT_POST, 1) ;
@@ -62,7 +108,7 @@ class ImageClientSDK {
 			"description"=>$description,
 			"private_token"=>$private_token,
 			"app"=> $this->_config->app
-			,
+		,
 			"token"=> $this->_config->token,
 		) ) ;
 
@@ -114,6 +160,27 @@ class ImageClientSDK {
 		return $albumVO ;
 	}
 
+	/**
+	 * lista as imagens de um album
+	 * @param $album_id
+	 * @param null $alias
+	 * @param null $private_token
+	 * @return something|null
+	 * @throws \ErrorException
+	 */
+	public function showImagesOfAlbum( $album_id, $alias = NULL, $private_token = NULL ){
+		$query = http_build_query( array(
+			"app"=> $this->_config->app ,
+			"token"=> $this->_config->token,
+			"private_token"=>$private_token,
+			"alias"=>$alias,
+			"album_id"=>$album_id
+		) ) ;
+		$url = $this->_config->url ."album/show/?".$query;
+		$resultString = file_get_contents( $url ) ;
+		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
+		return $this->getResultHandled( $result ) ;
+	}
 	/**
 	 * @param string $private_token
 	 * @return ARMAlbumVO[]

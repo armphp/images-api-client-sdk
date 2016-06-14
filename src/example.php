@@ -8,24 +8,31 @@
 include_once "arm/modules/images/ImageClientSDK.php" ;
 use ARM\Modules\Images;
 
+/**
+ * ATENÇÃO: É necessário o token, e existe o token com permissão de escrite e de leitura. Passe o token correspondente
+ */
+
 $config = new Images\ImageClientConfigVO();
-$config->app 		= "teste" ;
-$config->url 		= "http://localhost/images_project/" ;
+$config->app 		= "demo" ;
+//$config->url 		= "http://localhost/images_project/" ;
+$config->url 		= "http://i.democrart.com.br/" ;
 //$config->url 		= "http://images.idress.com.br/" ;
 
-$config->token 		= "" ;
+$config->token 		= "afdsf3kjr493_" ;
 
 $ImageClientSDK = new Images\ImageClientSDK() ;
 $ImageClientSDK->setConfig( $config ) ;
-############  CRIANDO UM NOVO ALBUM ############
-//try {
-//	$resultAlbum = $ImageClientSDK->createNewAlbum("teste");
-//} catch ( ErrorException $e ){
-//	//erro ao acessar api
-//	var_dump( $e ) ;
-//}
-//var_dump($resultAlbum) ;
 
+############  CRIANDO UM NOVO ALBUM ############
+try {
+	$resultAlbum = $ImageClientSDK->createNewAlbum("teste");
+	var_dump($resultAlbum) ;
+} catch ( ErrorException $e ){
+	//erro ao acessar api
+	var_dump( $e ) ;
+}
+//
+die ;
 ############  LISTANDO TODOS OS ALBUNS ############
 //$resultListAllAlbuns = $ImageClientSDK->showAllAlbuns() ;
 //var_dump( $resultListAllAlbuns ) ;
@@ -72,3 +79,5 @@ $alias = "album" ;
 $private_token = "";
 $resultSentImage = $ImageClientSDK->sendImage("arm_logo.jpg",$album_id, $alias, $private_token ) ;
 var_dump( $resultSentImage ) ;
+
+
