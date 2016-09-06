@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Renato Miawaki
@@ -6,7 +7,6 @@
  * Time: 15:13
  */
 namespace ARM\Modules\Images;
-
 class ImageClientSDK {
 	/**
 	 * @var ImageClientConfigVO
@@ -18,7 +18,13 @@ class ImageClientSDK {
 		$this->_config->url = \ARMDataHandler::removeLastBar( $this->_config->url )."/";
 	}
 
-
+	/**
+	 * Troca o token interno
+	 * @param $token
+	 */
+	public function changeToken( $token ){
+		$this->_config->token = $token ;
+	}
 	/**
 	 * Retorna o src da imagem original
 	 * Útil apenas para projetos em que o módulo sdk está instalado no mesmo servidor.
@@ -36,12 +42,10 @@ class ImageClientSDK {
 			"raw"=>1
 		) ) ;
 		$url = $this->_config->url ."image/show/id.$id/?".$query;
-		li( $url ) ;
 		$resultString = file_get_contents( $url ) ;
 		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
 		return $this->getResultHandled( $result ) ;
 	}
-
 	/**
 	 * Retorna a url da imagem no projeto configurado
 	 * @param $id
@@ -62,6 +66,7 @@ class ImageClientSDK {
 		) ) ;
 		$url = $this->_config->url ."image/show/id.$id/?".$query;
 		return $url ;
+
 	}
 	/**
 	 * Envia um arquivo local para um album
@@ -72,7 +77,7 @@ class ImageClientSDK {
 	 * @return mixed
 	 * @throws \ErrorException
 	 */
-	public function sendImage( $localPath, $album_id = NULL, $alias = "album" , $private_token = ""){
+	public function sendImage( $localPath, $album_id = NULL, $alias = "album" , $private_token = "" ){
 		if(!file_exists($localPath)){
 			throw new \ErrorException("file not exists $localPath ") ;
 		}
@@ -94,7 +99,6 @@ class ImageClientSDK {
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $args) ;
 		return curl_exec($ch);
 	}
-
 	/**
 	 * Cria um novo album e retorna as infos salvas
 	 * @param $name
@@ -111,9 +115,7 @@ class ImageClientSDK {
 		,
 			"token"=> $this->_config->token,
 		) ) ;
-
 		$url = $this->_config->url ."album/create_new/?".$query;
-
 		$resultString = file_get_contents( $url ) ;
 		$result = json_decode( $resultString, FALSE, 512, JSON_UNESCAPED_SLASHES ) ;
 		$returnResult = $this->getResultHandled( $result ) ;
@@ -125,7 +127,6 @@ class ImageClientSDK {
 			}
 		}
 	}
-
 	/**
 	 * Retorna um erro tratado e já gera excessão caso não funcione
 	 * @param $result
@@ -159,7 +160,6 @@ class ImageClientSDK {
 		$albumVO->private_token = (isset($obj->private_token))?$obj->private_token:NULL ;
 		return $albumVO ;
 	}
-
 	/**
 	 * lista as imagens de um album
 	 * @param $album_id
@@ -211,7 +211,6 @@ class ImageClientSDK {
 		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
 		return $this->getResultHandled( $result ) ;
 	}
-
 	/**
 	 *
 	 * retorno { success:bool, result:ARMAlbumVO, array_messages:string[] }
@@ -227,11 +226,9 @@ class ImageClientSDK {
 			"app"=> $this->_config->app ,
 			"token"=> $this->_config->token
 		) ) ;
-
 		$postdata = http_build_query(
 			(array) $albumVO
 		);
-
 		$opts = array('http' =>
 			array(
 				'method'  => 'POST',
@@ -245,7 +242,6 @@ class ImageClientSDK {
 		$result = json_decode( $resultString , FALSE, 512,  JSON_UNESCAPED_SLASHES ) ;
 		return $this->getResultHandled( $result ) ;
 	}
-
 	/**
 	 * Desvincula uma imagem a um album
 	 * @param $image_id
@@ -296,32 +292,26 @@ if( ! class_exists( "ImageClientConfigVO" ) ) {
 if( ! class_exists( "ARMAlbumVO" ) ) {
 	class ARMAlbumVO
 	{
-
 		/**
 		 * @type : int(11)
 		 */
 		public $id;
-
 		/**
 		 * @type : int(11)
 		 */
 		public $active;
-
 		/**
 		 * @type : int(11)
 		 */
 		public $order;
-
 		/**
 		 * @type : varchar(255)
 		 */
 		public $name;
-
 		/**
 		 * @type : text
 		 */
 		public $description;
-
 		/**
 		 * @type : varchar(255)
 		 */
